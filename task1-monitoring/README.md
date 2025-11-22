@@ -17,13 +17,6 @@ Below is the architecture diagram demonstrating the full flow:
 ✔ Grafana for dashboards (visualization)
 ✔ Alertmanager for notifications (alerting)
 
-📌 **Architecture Diagram (Task 1)**
-*(Insert your PNG here in your repository)*
-
-```
-A_2D_digital_illustration_flowchart_depicts_a_moni.png
-```
-
 ---
 
 ## **2. Components**
