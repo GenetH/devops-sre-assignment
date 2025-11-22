@@ -1,4 +1,4 @@
-# Task 4 — Disaster Recovery & Backup Automation
+# Task 4 : Disaster Recovery & Backup Automation
 
 This implements automated, verifiable backups with safe restore and clear RPO/RTO targets. Includes:
 - `scripts/backup.sh` – scheduled backups with rotation (S3 or local)

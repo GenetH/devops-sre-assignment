@@ -1,4 +1,4 @@
-# **Task 1  Monitoring, Observability & Alerting System**
+# **Task 1:  Monitoring, Observability & Alerting System**
 
 This task delivers a complete monitoring architecture using **Prometheus**, **Grafana**, and **Alertmanager**.
 It follows the required flow from the assignment:

@@ -1,4 +1,4 @@
-# Task 3 — Incident Response
+# Task 3: Incident Response
 
 ## Purpose
 This repository contains resources and documentation for managing incident response processes within the organization. It aims to provide a structured approach to identifying, managing, and learning from incidents to improve overall system reliability and team preparedness.
