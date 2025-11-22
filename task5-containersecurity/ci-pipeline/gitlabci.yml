@@ -1,0 +1,78 @@
+stages:
+  - build
+  - scan
+  - enforce
+  - push
+
+variables:
+  IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
+
+# ---------------------------------------------------------
+# Stage 1 — Build Docker Image
+# ---------------------------------------------------------
+build-image:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "$IMAGE" .
+    - echo "Built image: $IMAGE"
+
+# ---------------------------------------------------------
+# Stage 2 — Trivy Vulnerability Scan
+# ---------------------------------------------------------
+trivy-scan:
+  stage: scan
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  needs: [build-image]
+  script:
+    - trivy image --format json --output trivy-report.json \
+        --severity HIGH,CRITICAL \
+        --exit-code 1 \
+        "$IMAGE"
+  artifacts:
+    when: always
+    paths:
+      - trivy-report.json
+  allow_failure: false
+
+# ---------------------------------------------------------
+# Stage 3 — OPA Policy (Conftest)
+# ---------------------------------------------------------
+opa-policy-check:
+  stage: enforce
+  image: ubuntu:22.04
+  needs: [trivy-scan]
+  before_script:
+    - apt-get update && apt-get install -y wget curl jq tar
+    - wget -q https://github.com/open-policy-agent/conftest/releases/latest/download/conftest_Linux_x86_64.tar.gz -O conftest.tar.gz || true
+    - if [ ! -s conftest.tar.gz ]; then
+        VERSION=$(curl -s https://api.github.com/repos/open-policy-agent/conftest/releases/latest | jq -r '.tag_name');
+        wget https://github.com/open-policy-agent/conftest/releases/download/$VERSION/conftest_${VERSION#v}_Linux_x86_64.tar.gz -O conftest.tar.gz;
+      fi
+    - tar -xzf conftest.tar.gz
+    - mv conftest /usr/local/bin/
+  script:
+    - conftest test Dockerfile --policy policies/
+  allow_failure: false
+
+# ---------------------------------------------------------
+# Stage 4 — Push Image (if all previous stages pass)
+# ---------------------------------------------------------
+push-image:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  needs: [opa-policy-check]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker pull "$IMAGE"
+    - docker tag "$IMAGE" "$CI_REGISTRY_IMAGE:latest"
+    - docker push "$CI_REGISTRY_IMAGE:latest"

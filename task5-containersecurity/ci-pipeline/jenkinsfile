@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "registry.company.com/app:${BUILD_NUMBER}"
+    }
+
+    stages {
+
+        stage('Build Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME .'
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                    trivy image --exit-code 1 --severity HIGH,CRITICAL \
+                    --format json -o trivy-report.json $IMAGE_NAME
+                '''
+            }
+        }
+
+        stage('OPA Policy Enforcement') {
+            steps {
+                sh '''
+                    conftest test Dockerfile --policy policies/
+                '''
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh '''
+                    echo "$REGISTRY_PASSWORD" | docker login registry.company.com \
+                    -u "$REGISTRY_USER" --password-stdin
+                    docker push $IMAGE_NAME
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'trivy-report.json', fingerprint: true
+        }
+        failure {
+            mail to: 'devops@company.com',
+                 subject: 'Security Pipeline Failure',
+                 body: 'Pipeline failed due to vulnerabilities or policy violations.'
+        }
+        success {
+            echo "Image pushed successfully. All security checks passed."
+        }
+    }
+}
