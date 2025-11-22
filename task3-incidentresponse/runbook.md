@@ -1,10 +1,3 @@
-Awesome—here’s a clean, production-ready **`task3-incident-management/runbook.md`** you can drop into your repo.
-
----
-
-## `task3-incident-management/runbook.md`
-
-````markdown
 # Runbook – Production Incident Quick Actions
 
 **Goal:** Move fast, reduce user impact, and restore SLOs. Use this playbook with the Incident Response Plan (IRP).
@@ -215,9 +208,5 @@ Templates are in **incident-response-plan.md**.
 * Dashboards: *<insert URLs>*
 * On-call & escalation: *<insert contacts>*
 
-```
 
----
 
-If you want this runbook split into multiple focused runbooks (e.g., `runbook-disk-pressure.md`, `runbook-website-down.md`), say the word and I’ll generate them too.
-```

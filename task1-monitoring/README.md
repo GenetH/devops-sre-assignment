@@ -177,6 +177,6 @@ This task implements a complete observability stack that provides:
 * **Actionable dashboards** with Grafana
 * **Reliable alerting** with Alertmanager
 
-This setup enables proactive monitoring, fast incident detection, and operational visibility—meeting all requirements defined in the assignment PDF.
+
 
 

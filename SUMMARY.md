@@ -2,7 +2,7 @@
 
 This repository contains five production-focused deliverables that together demonstrate an SRE mindset across **observability**, **configuration automation**, **incident response**, **disaster recovery**, and **container security** organized exactly as required in the assignment structure. 
 
-## Reliability goals (cross-cutting)
+## Reliability goals 
 
 * **User impact first:** alerts map to page/warn/ticket; dashboards center on latency (P95/P99), error rate, and saturation.
 * **Safety in change:** staged rollouts, health gates, immutable artifacts, and fast rollback paths.
@@ -11,7 +11,7 @@ This repository contains five production-focused deliverables that together demo
 
 ---
 
-## Task 1 — Monitoring, Observability & Alerting
+## Task 1 - Monitoring, Observability & Alerting
 
 * **Design:** Prometheus + Alertmanager + Grafana. HA-capable (dual scrapers, optional remote_write to long-term store).
 * **What’s monitored:** host (CPU, memory, disk runout), containers, and app (RPS, 5xx rate, latency histograms).
