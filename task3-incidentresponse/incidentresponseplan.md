@@ -8,8 +8,6 @@
 - **SEV-3 (Medium):** Partial impact or workaround exists. Handle during business hours.
 - **SEV-4 (Low):** Early warning (disk growth, cert expiring). Track as ticket.
 
-> If unsure, start higher severity and downgrade.
-
 ## 2) Roles (one person may hold two; **IC is single owner**)
 - **Incident Commander (IC):** Owns severity, priorities, and decisions.
 - **Tech Lead (TL):** Leads diagnosis/mitigations; delegates checks.
