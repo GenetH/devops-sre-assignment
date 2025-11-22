@@ -1,6 +1,6 @@
 # SUMMARY
 
-This repository contains five production-focused deliverables that together demonstrate an SRE mindset across **observability**, **configuration automation**, **incident response**, **disaster recovery**, and **container security**—organized exactly as required in the assignment structure. 
+This repository contains five production-focused deliverables that together demonstrate an SRE mindset across **observability**, **configuration automation**, **incident response**, **disaster recovery**, and **container security** organized exactly as required in the assignment structure. 
 
 ## Reliability goals (cross-cutting)
 
@@ -22,20 +22,20 @@ This repository contains five production-focused deliverables that together demo
   * SLO burn (99.9%): fast (5m @ 14.4×) → page; slow (1h @ 6×) → ticket.
 * **Ops:** dashboards for service health; inhibition avoids alert storms; configs are reloadable.
 
-## Task 2 — Configuration Management & Scalable Production Deployment
+## Task 2 - Configuration Management & Scalable Production Deployment
 
 * **Tooling:** Ansible with inventories, roles, and vaulted group vars.
 * **Security & hardening:** SSH key-only, root login disabled, UFW default-deny, fail2ban, time sync, auditd, SSH ciphers/MACs pinned.
 * **Deployments:** rolling serial waves with health checks; Docker runtime installed/pinned; systemd-managed app service.
 * **Idempotency:** declarative modules; handlers trigger only on change; --check and lint in CI.
 
-## Task 3 — Incident Management & Reliability Governance
+## Task 3 - Incident Management & Reliability Governance
 
 * **IR plan:** roles (IC/Comms/Owner), comms flow (Slack + status page), severity ladder, paging rules, and stakeholder updates schedule.
 * **Runbook (example):** DB outage / API latency—detect → triage → mitigate (traffic shed/circuit breaker) → recover → verify.
 * **Postmortem:** timeline, root cause, contributing factors, impact, corrective actions with owners/dates; learning items captured.
 
-## Task 4 — Disaster Recovery & Backup Automation
+## Task 4 - Disaster Recovery & Backup Automation
 
 * **Backups:** backup.sh (tar → compress → optional AES-GCM encrypt → checksum → manifest), scheduled with retention.
 * **Verification:** verifybackup.py (SHA-256 + archive readability).
@@ -43,7 +43,7 @@ This repository contains five production-focused deliverables that together demo
 * **RPO/RTO:** 15–60 min RPO depending on data class; <30 min app restore / <2 h full host.
 * **Storage:** S3 (versioning + lifecycle) or NFS; secrets outside VCS; optional cross-region copy.
 
-## Task 5 — Container Security & Compliance Automation
+## Task 5 - Container Security & Compliance Automation
 
 * **CI gates:** image build → vulnerability scan → policy enforcement → sign/attest → deploy if clean.
 * **Blocks:** critical/high CVEs or policy violations fail the pipeline; reports surfaced in CI UI and Slack.
@@ -56,15 +56,6 @@ This repository contains five production-focused deliverables that together demo
 * **Task 1:** docker compose up -d in task1-monitoring/; open Prometheus (9090) and Grafana (3000). Trigger InstanceDown by stopping node-exporter to see alerts.
 * **Task 2:** ansible-playbook -i inventory/prod.ini site.yml --check then apply; verify systemctl status <app>.
 * **Task 4:** run scripts/backup.sh, then verifybackup.py and restore.sh to /tmp/restore.
-
----
-
-## Key trade-offs
-
-* **Noise vs. signal:** multi-window SLO burn and inhibition reduce false pages while keeping time-to-detect low.
-* **Speed vs. safety:** higher Ansible parallelism balanced by serial canaries + health checks.
-* **Cost vs. durability:** S3 lifecycle rules for cold retention; local pruning for fast restores.
-* **Security vs. operability:** strict SSH/sudo scopes and encrypted secrets, with clear runbooks to keep on-call fast.
 
 ---
 
