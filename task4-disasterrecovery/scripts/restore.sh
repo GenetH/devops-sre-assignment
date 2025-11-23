@@ -57,7 +57,7 @@ case "$ENCRYPTION" in
   openssl) : "${OPENSSL_PASSWORD:?Set OPENSSL_PASSWORD}"; openssl enc -d -aes-256-cbc -pbkdf2 -pass pass:"$OPENSSL_PASSWORD" -in "$artifact" -out "${artifact%.enc}"; artifact="${artifact%.enc}";;
   none) ;;
   *) echo "Unknown ENCRYPTION=$ENCRYPTION"; exit 2;;
-endcase
+esac
 
 log "Verifying checksum"
 if command -v sha256sum >/dev/null 2>&1; then

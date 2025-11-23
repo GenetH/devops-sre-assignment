@@ -39,7 +39,7 @@ Prometheus carries out three main tasks:
 3. **Evaluation**
    * It checks alert rules and recording rules defined in the configurations.
 
-Your Prometheus configuration file is available at:
+Prometheus configuration file is available at:
 
 ```
 configs/prometheus.yml
@@ -133,7 +133,7 @@ configs/alertrules.yml
 ```
 task1-monitoring/
 │
-├── architecturediagram.png            ← Your PNG diagram  
+├── architecturediagram.png            ← PNG diagram  
 │
 ├── configs/
 │   ├── prometheus.yml                 ← Prometheus scrape config  

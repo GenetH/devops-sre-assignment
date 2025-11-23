@@ -39,5 +39,3 @@ We had a failure, affecting several users for a specific duration. Here’s the 
 
 ## 8) Artifacts / Links
 Dashboards, PromQL queries, logs, PRs/SHAs, Jira tickets, status-page entries.
-
-> Blameless: we improve systems and processes, not individuals.
