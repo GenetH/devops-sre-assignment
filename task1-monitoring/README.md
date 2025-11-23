@@ -5,8 +5,6 @@ This task creates a full monitoring setup using **Prometheus**, **Grafana**, and
 
 The system gathers metrics from instrumented services, stores and evaluates them in Prometheus, shows insights in Grafana, and produces actionable alerts using Alertmanager.
 
----
-
 ## **1. Architecture Overview**
 
 Here is the architecture diagram showing the entire flow:
@@ -15,8 +13,6 @@ Here is the architecture diagram showing the entire flow:
 ✔ Prometheus scraping (pull model)  
 ✔ Grafana for dashboards (visualization)  
 ✔ Alertmanager for notifications (alerting)  
-
----
 
 ## **2. Components**
 
@@ -29,8 +25,6 @@ These are application or system parts that expose metrics at a `/metrics` endpoi
 * cAdvisor (container metrics)  
 
 Prometheus uses the **pull model** to scrape these metrics.
-
----
 
 ### **Prometheus (Scraping, Storage, Evaluation)**
 
@@ -57,8 +51,6 @@ Alert rules are specified in:
 configs/alertrules.yml
 ```
 
----
-
 ### **Grafana (Visualization Layer)**
 
 Grafana connects to Prometheus as a data source and offers:
@@ -72,8 +64,6 @@ Datasource provisioning file:
 ```
 configs/grafanadatasource.yml
 ```
-
----
 
 ### **Alertmanager (Alert Routing & Notification Layer)**
 
@@ -91,8 +81,6 @@ Alertmanager manages:
 * Silencing  
 * Notification delivery  
 
----
-
 ## **3. Monitoring Flow (Required from PDF)**
 
 ### **Collection, Visualization, Alerting**
@@ -106,8 +94,6 @@ Alertmanager manages:
 3. **Alerting**  
    Prometheus activates rules → Alertmanager → Notification channels.
 
----
-
 ## **4. Key Metrics to Monitor**
 
 The system usually monitors:
@@ -119,8 +105,6 @@ The system usually monitors:
 * Error rate (4xx, 5xx)  
 * Latency percentiles  
 * Container metrics (CPU/memory limits, restarts)  
-
----
 
 ## **5. Alerting Strategy**
 
@@ -144,8 +128,6 @@ Alert rules are defined in:
 configs/alertrules.yml
 ```
 
----
-
 ## **6. Project Structure (as required)**
 
 ```
@@ -160,8 +142,6 @@ task1-monitoring/
 │
 └── README.md                          ← This documentation  
 ```
-
----
 
 ## **7. Summary**
 

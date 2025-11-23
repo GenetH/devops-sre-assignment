@@ -1,17 +1,13 @@
-# Runbook – Production Incident Quick Actions
+# Runbook, Production Incident Quick Actions
 
-**Goal:** Move fast, reduce user impact, and restore SLOs. Use this playbook with the Incident Response Plan (IRP).
-
----
+**Goal:** Move quickly, minimize user impact, and restore SLOs. Use this playbook alongside the Incident Response Plan (IRP).
 
 ## 0) First 5 Minutes (All Incidents)
 
 1. **Acknowledge** the alert (≤ 5 min).
-2. **Declare** incident & set **SEV** (IC assigned) – open Slack `#incident-<YYYYMMDD-HHMM>` + Jira `INC-xxxx`.
-3. **Snapshot context:** Grafana screenshots, last deploy SHA, change/feature flags.
-4. **Stabilize first** (rollback/traffic-shift/circuit-breakers), then diagnose.
-
----
+2. **Declare** the incident and set **SEV** (IC assigned) by opening Slack `#incident-<YYYYMMDD-HHMM>` and Jira `INC-xxxx`.
+3. **Snapshot context:** Take screenshots in Grafana, note the last deploy SHA, and check change/feature flags.
+4. **Stabilize first** by rolling back, shifting traffic, or using circuit breakers, then diagnose.
 
 ## 1) Quick Checks (links & commands)
 
@@ -23,27 +19,21 @@
 **Prometheus reload (no restart):**
 ```bash
 curl -X POST http://<prom>:9090/-/reload
-````
+```
 
 **Recent deploys (example):**
-
 ```bash
 git --no-pager log --oneline -n 10
 ```
-
----
-
 ## 2) High-Signal PromQL Cheatsheet
 
 **App 5xx rate (%):**
-
 ```
 100 * sum(rate(http_requests_total{job="app",code=~"5.."}[5m]))
     / sum(rate(http_requests_total{job="app"}[5m]))
 ```
 
 **App P95 latency (s):**
-
 ```
 histogram_quantile(0.95,
   sum by (le) (rate(http_request_duration_seconds_bucket{job="app"}[5m]))
@@ -51,7 +41,6 @@ histogram_quantile(0.95,
 ```
 
 **P95 by route (find hot endpoints):**
-
 ```
 histogram_quantile(0.95,
   sum by (le, path) (rate(http_request_duration_seconds_bucket{job="app"}[5m]))
@@ -59,61 +48,51 @@ histogram_quantile(0.95,
 ```
 
 **Host CPU %:**
-
 ```
 100 * (1 - avg by (instance)(rate(node_cpu_seconds_total{mode="idle"}[5m])))
 ```
 
 **Host Memory %:**
-
 ```
 100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))
 ```
 
 **Disk filling in < 4h:**
-
 ```
 predict_linear(node_filesystem_free_bytes{fstype!~"tmpfs|overlay|squashfs"}[6h], 4*3600) < 0
 ```
 
 **Top 5 containers by CPU (cAdvisor):**
-
 ```
 topk(5, sum by (name) (rate(container_cpu_usage_seconds_total[5m])))
 ```
 
 **Website probe success (Blackbox):**
-
 ```
 avg(probe_success{job="website-https"})
 ```
-
----
 
 ## 3) Common Scenarios & Actions
 
 ### A) **API down / 5xx > 5% (SEV-1)**
 
-**Symptoms:** `HTTPErrorRateHigh`, user errors, status 5xx spikes.
+**Symptoms:** `HTTPErrorRateHigh`, user errors, spikes in status 5xx.
 
 **Immediate actions (choose safest first):**
 
-* **Rollback** to previous stable version.
-* **Feature-flag off** recent risky toggles.
-* **Circuit-break** slow/failed downstreams; **graceful degrade** (read-only / cached responses).
+* **Rollback** to the previous stable version.
+* **Turn off** recent risky feature flags.
+* **Circuit-break** slow or failed downstreams and **gracefully degrade** to read-only or cached responses.
 
 **Then diagnose:**
 
-* Which routes error?
-
+* Which routes are causing errors?
   ```
   sum by (path) (rate(http_requests_total{job="app",code=~"5.."}[5m]))
   ```
-* Downstream latency/errors if instrumented.
+* Check downstream latency and errors, if instrumented.
 
-**Recover:** Errors back to baseline ≥ 30 min; remove mitigations gradually.
-
----
+**Recover:** Wait for errors to return to baseline for at least 30 minutes, then remove mitigations gradually.
 
 ### B) **Latency spike P95 > 500ms (SEV-2)**
 
@@ -121,85 +100,68 @@ avg(probe_success{job="website-https"})
 
 **Mitigations:**
 
-* **Rollback** latest deploy; disable heavy features.
-* **Autoscale** app; ensure DB/queue headroom.
-* **Rate-limit** hot endpoints; **increase CDN TTL** for static/content paths.
+* **Rollback** the latest deploy and disable heavy features.
+* **Autoscale** the app and check DB/queue headroom.
+* **Rate-limit** busy endpoints and **increase CDN TTL** for static/content paths.
 
-**Deep dive:** P95 by route; DB/query histograms; container CPU throttling.
-
----
+**Deep dive:** Look at P95 by route, check DB/query histograms, and monitor container CPU throttling.
 
 ### C) **InstanceDown / node unreachable (SEV-2)**
 
-**Symptoms:** `InstanceDown` firing; one or more targets down.
+**Symptoms:** `InstanceDown` alert triggered; one or more targets are down.
 
 **Mitigations:**
 
-* **Drain traffic** from bad node; replace instance/pod.
-* Check **ingress/SDN/SG** rules; restart agent/exporters.
+* **Drain traffic** from the problematic node and replace the instance or pod.
+* Check **ingress/SDN/SG** rules and restart agents/exporters.
 
 **Probe:**
-
 ```
 up{instance="<host:port>"} == 0
 ```
-
----
 
 ### D) **DiskFillingSoon (< 4h) (SEV-2/3)**
 
 **Mitigations:**
 
-* **Purge** logs/caches; expand volume; lower retention.
-* If DB, move cold data or enable compression.
+* **Purge** logs and caches, expand the volume, or lower retention.
+* If using a database, move cold data or enable compression.
 
-**Verify:** Disk headroom > 24h.
-
----
+**Verify:** Ensure disk headroom is greater than 24 hours.
 
 ### E) **TLS cert expiring (SEV-3)**
 
-**Symptoms:** `SSLCertExpiringSoon` from Blackbox.
+**Symptoms:** `SSLCertExpiringSoon` alert from Blackbox.
 
 **Mitigations:**
 
-* Renew cert (ACME/LE or CA); redeploy ingress/reverse proxy.
+* Renew the certificate (using ACME/LE or CA) and redeploy the ingress or reverse proxy.
 
 **Probe:**
-
 ```
 (probe_ssl_last_chain_expiry_timestamp_seconds - time()) < 14*24*3600
 ```
-
----
-
 ## 4) Rollback / Traffic Controls (patterns)
 
-* **App rollback:** use your deploy tool (`kubectl rollout undo`, `helm rollback`, CI “Revert” pipeline).
-* **Traffic shift:** lower canary to 0%; switch route to last stable; disable new paths at gateway.
-* **Circuit breaker:** reduce concurrency/timeouts to a flaky backend; serve cached responses where possible.
+* **App rollback:** Use your deploy tool (`kubectl rollout undo`, `helm rollback`, CI “Revert” pipeline).
+* **Traffic shift:** Lower canary to 0%, switch route to the last stable, and disable new paths at the gateway.
+* **Circuit breaker:** Reduce concurrency or timeouts for a flaky backend and serve cached responses when possible.
 
-**Always record:** exact SHA/flag/replica changes.
-
----
+**Always record:** The exact SHA, flag, and replica changes.
 
 ## 5) Communication Cadence
 
-* **SEV-1:** status page + internal update every **15 min**.
-* **SEV-2:** every **30 min**.
-* Include: current impact, actions taken, ETA/next update, owner names.
+* **SEV-1:** Provide a status page and internal updates every **15 minutes**.
+* **SEV-2:** Provide updates every **30 minutes**.
+* Include current impact, actions taken, ETA for the next update, and names of owners.
 
-Templates are in **incident-response-plan.md**.
-
----
+Templates are available in **incident-response-plan.md**.
 
 ## 6) Close & Learn
 
-* **Close** when SLOs stable for ≥ 60 min and mitigations are safely unwound.
-* Open **postmortem** within 24h; publish ≤ 5 business days.
-* Create **CPAs** with owners & due dates; add evidence links.
-
----
+* **Close** the incident when SLOs are stable for at least 60 minutes and mitigations are safely removed.
+* Open a **postmortem** within 24 hours and publish it within 5 business days.
+* Create **CPAs** with owners and due dates, adding links to evidence.
 
 ## 7) Links
 
@@ -207,6 +169,3 @@ Templates are in **incident-response-plan.md**.
 * Postmortem Template: `postmortem-template.md`
 * Dashboards: *<insert URLs>*
 * On-call & escalation: *<insert contacts>*
-
-
-

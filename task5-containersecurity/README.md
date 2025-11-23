@@ -1,49 +1,49 @@
 # Task 5: Container Security and Compliance Automation
 
-## Objective
-Automate container image security scanning and compliance checks inside the CI/CD pipeline to ensure only secure and trusted images are deployed into production.
+## Objective  
+Automate container image security scanning and compliance checks within the CI/CD pipeline. This ensures that only secure and trusted images are deployed to production.
 
-## Production Requirements Implemented
-- Vulnerability scanning using **Trivy** (industry-standard).
-- Compliance/policy checks using **OPA (Open Policy Agent)**.
-- Pipeline blocks deployments if:
-  - Critical vulnerabilities exist.
-  - Image violates production policies (e.g., runs as root, missing labels, no tag pinning).
-- Detailed reports are stored as artifacts.
-- Fail-fast behavior ensures unsafe images never reach production.
+## Production Requirements Implemented  
+- Vulnerability scanning using **Trivy** (a standard in the industry).
+- Compliance checks using **OPA (Open Policy Agent)**.
+- The pipeline blocks deployments if:
+  - Critical vulnerabilities are present.
+  - The image violates production policies (for example, runs as root, lacks labels, or has no tag pinning).
+- Detailed reports are saved as artifacts.
+- A fail-fast method ensures unsafe images do not reach production.
 
-## Tools Used
-### ✔ Trivy
+## Tools Used  
+### ✔ Trivy  
 Used for vulnerability scanning.  
-Reason: Fast, lightweight, widely adopted in production pipelines.
+Reason: It is fast, lightweight, and widely used in production pipelines.
 
-### ✔ OPA (Conftest)
-Used for enforcement of custom security rules.  
-Reason: Flexible, declarative, compatible with GitLab CI and Jenkins.
+### ✔ OPA (Conftest)  
+Used to enforce custom security rules.  
+Reason: It is flexible, declarative, and works well with GitLab CI and Jenkins.
 
-## Execution in Pipeline
-1. Developer commits code.
-2. Build pipeline creates a container image.
-3. **Trivy Scan Stage**
-   - Scans OS & application packages.
-   - Generates JSON + HTML reports.
-   - Fails pipeline on High/Critical issues.
+## Execution in Pipeline  
+1. The developer commits code.  
+2. The build pipeline creates a container image.  
+3. **Trivy Scan Stage**  
+   - Scans OS and application packages.  
+   - Creates JSON and HTML reports.  
+   - Fails the pipeline if high or critical issues are found.
 
-4. **Policy Enforcement Stage (OPA)**
-   - Checks Dockerfile for best-practices.
-   - Validates labels, non-root user, version pinning, no latest tag.
-   - Blocks deployment if any rule is violated.
+4. **Policy Enforcement Stage (OPA)**  
+   - Checks the Dockerfile for best practices.  
+   - Validates labels, non-root user, version pinning, and no latest tag.  
+   - Blocks deployment if any rule is broken.
 
-5. Only compliant images are pushed to registry.
+5. Only compliant images are pushed to the registry.
 
-## Reporting & Blocking
-- PDF/HTML/JSON reports stored as CI artifacts.
-- Merge request shows pass/fail results.
-- Pipeline stops immediately on:
-  - Critical vulnerabilities.
-  - Non-compliant configuration.
+## Reporting & Blocking  
+- PDF, HTML, and JSON reports are saved as CI artifacts.  
+- The merge request shows pass or fail results.  
+- The pipeline stops right away on:  
+  - Critical vulnerabilities.  
+  - Non-compliant configurations.
 
-## Production Notes
-- Trivy database auto-updates daily.
-- Policies stored in version control for transparency.
-- Pipeline integrated with container registry (GitHub, GitLab, ECR, Harbor).
+## Production Notes  
+- The Trivy database updates automatically every day.  
+- Policies are stored in version control for transparency.  
+- The pipeline integrates with the container registry (GitHub, GitLab, ECR, Harbor).
