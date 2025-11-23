@@ -1,21 +1,20 @@
-# **Task 1:  Monitoring, Observability & Alerting System**
+# **Task 1: Monitoring, Observability & Alerting System**
 
-This task delivers a complete monitoring architecture using **Prometheus**, **Grafana**, and **Alertmanager**.
-It follows the required flow from the assignment:
-**collection → visualization → alerting**
+This task creates a full monitoring setup using **Prometheus**, **Grafana**, and **Alertmanager**. It follows the main steps outlined in the assignment:  
+**collection, visualization, alerting**.
 
-The system collects metrics from instrumented services, stores and evaluates them in Prometheus, visualizes insights in Grafana, and generates actionable alerts via Alertmanager.
+The system gathers metrics from instrumented services, stores and evaluates them in Prometheus, shows insights in Grafana, and produces actionable alerts using Alertmanager.
 
 ---
 
 ## **1. Architecture Overview**
 
-Below is the architecture diagram demonstrating the full flow:
+Here is the architecture diagram showing the entire flow:
 
-✔ Instrumented services exposing metrics
-✔ Prometheus scraping (pull model)
-✔ Grafana for dashboards (visualization)
-✔ Alertmanager for notifications (alerting)
+✔ Instrumented services that expose metrics  
+✔ Prometheus scraping (pull model)  
+✔ Grafana for dashboards (visualization)  
+✔ Alertmanager for notifications (alerting)  
 
 ---
 
@@ -23,40 +22,36 @@ Below is the architecture diagram demonstrating the full flow:
 
 ### **Instrumented Services (Collection Layer)**
 
-These are application or system components that expose metrics via a `/metrics` endpoint.
-Examples include:
+These are application or system parts that expose metrics at a `/metrics` endpoint. Examples include:
 
-* Application services (Node.js, Go, Python, Java with Prometheus libraries)
-* Node Exporter (system metrics)
-* cAdvisor (container metrics)
+* Application services (Node.js, Go, Python, Java with Prometheus libraries)  
+* Node Exporter (system metrics)  
+* cAdvisor (container metrics)  
 
-Prometheus uses the **pull model** to scrape metrics from these endpoints.
+Prometheus uses the **pull model** to scrape these metrics.
 
 ---
 
 ### **Prometheus (Scraping, Storage, Evaluation)**
 
-Prometheus performs three core functions:
+Prometheus carries out three main tasks:
 
 1. **Scraping**
-
-   * Pulls metrics from instrumented services at configured intervals.
+   * It pulls metrics from instrumented services at set intervals.
 
 2. **Storage (TSDB)**
-
-   * Stores all collected metrics in its Time Series Database (TSDB).
+   * It saves all collected metrics in its Time Series Database (TSDB).
 
 3. **Evaluation**
+   * It checks alert rules and recording rules defined in the configurations.
 
-   * Evaluates alert rules and recording rules defined in the configs.
-
-Your Prometheus configuration file is located at:
+Your Prometheus configuration file is available at:
 
 ```
 configs/prometheus.yml
 ```
 
-Alert rules are defined in:
+Alert rules are specified in:
 
 ```
 configs/alertrules.yml
@@ -66,11 +61,11 @@ configs/alertrules.yml
 
 ### **Grafana (Visualization Layer)**
 
-Grafana connects to Prometheus as a datasource and provides:
+Grafana connects to Prometheus as a data source and offers:
 
-* Dashboards for CPU, memory, latency, error rates
-* Visualization of time-series metrics
-* Shared operational insights for teams
+* Dashboards for CPU, memory, latency, and error rates  
+* Visualization of time-series metrics  
+* Shared operational insights for teams  
 
 Datasource provisioning file:
 
@@ -82,48 +77,48 @@ configs/grafanadatasource.yml
 
 ### **Alertmanager (Alert Routing & Notification Layer)**
 
-Prometheus sends alert events to Alertmanager, which routes them to:
+Prometheus sends alert events to Alertmanager, which directs them to:
 
-* Slack
-* Email
-* PagerDuty
-* Webhooks
+* Slack  
+* Email  
+* PagerDuty  
+* Webhooks  
 
-Alertmanager handles:
+Alertmanager manages:
 
-* Deduplication
-* Grouping
-* Silencing
-* Notification delivery
+* Deduplication  
+* Grouping  
+* Silencing  
+* Notification delivery  
 
 ---
 
 ## **3. Monitoring Flow (Required from PDF)**
 
-### **Collection → Visualization → Alerting**
+### **Collection, Visualization, Alerting**
 
-1. **Collection**
-   Prometheus pulls metrics from instrumented services.
+1. **Collection**  
+   Prometheus gathers metrics from instrumented services.
 
-2. **Visualization**
+2. **Visualization**  
    Grafana queries Prometheus to create dashboards.
 
-3. **Alerting**
-   Prometheus triggers rules → Alertmanager → Notification channels.
+3. **Alerting**  
+   Prometheus activates rules → Alertmanager → Notification channels.
 
 ---
 
 ## **4. Key Metrics to Monitor**
 
-The system typically monitors:
+The system usually monitors:
 
-* CPU usage
-* Memory availability
-* Disk usage
-* Request rate
-* Error rate (4xx, 5xx)
-* Latency percentiles
-* Container metrics (CPU/mem limits, restarts)
+* CPU usage  
+* Memory availability  
+* Disk usage  
+* Request rate  
+* Error rate (4xx, 5xx)  
+* Latency percentiles  
+* Container metrics (CPU/memory limits, restarts)  
 
 ---
 
@@ -131,17 +126,17 @@ The system typically monitors:
 
 Common alert categories include:
 
-* High CPU or memory usage
-* Node or service down
-* Increased error rates
-* High request latency
-* Low available disk space
+* High CPU or memory usage  
+* Node or service downtime  
+* Increased error rates  
+* High request latency  
+* Low available disk space  
 
 Severity levels:
 
-* **Warning** → investigation
-* **Critical** → immediate response
-* **Page** → on-call escalation
+* **Warning** → investigation needed  
+* **Critical** → immediate action needed  
+* **Page** → on-call escalation  
 
 Alert rules are defined in:
 
@@ -156,27 +151,23 @@ configs/alertrules.yml
 ```
 task1-monitoring/
 │
-├── architecturediagram.png            ← Your PNG diagram
+├── architecturediagram.png            ← Your PNG diagram  
 │
 ├── configs/
-│   ├── prometheus.yml                 ← Prometheus scrape config
-│   ├── alertrules.yml                 ← Alert rules
-│   └── grafanadatasource.yml          ← Grafana provisioning
+│   ├── prometheus.yml                 ← Prometheus scrape config  
+│   ├── alertrules.yml                 ← Alert rules  
+│   └── grafanadatasource.yml          ← Grafana provisioning  
 │
-└── README.md                          ← This documentation
+└── README.md                          ← This documentation  
 ```
 
 ---
 
 ## **7. Summary**
 
-This task implements a complete observability stack that provides:
+This task builds a complete observability stack that provides:
 
-* **Metrics collection** from instrumented services
-* **Time-series data processing** with Prometheus
-* **Actionable dashboards** with Grafana
-* **Reliable alerting** with Alertmanager
-
-
-
-
+* **Metrics collection** from instrumented services  
+* **Time-series data processing** with Prometheus  
+* **Actionable dashboards** with Grafana  
+* **Reliable alerting** with Alertmanager  
