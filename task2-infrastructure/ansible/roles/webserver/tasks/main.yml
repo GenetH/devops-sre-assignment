@@ -1,0 +1,61 @@
+- name: Install Nginx and Node.js
+  apt:
+    name:
+      - nginx
+      - nodejs
+      - npm
+    state: present
+    update_cache: yes
+
+- name: Create application directories
+  file:
+    path: "/var/www/app/{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  loop:
+    - frontend
+    - backend
+
+- name: Copy frontend build files
+  synchronize:
+    src: "../../app/frontend/dist/"
+    dest: "/var/www/app/frontend/"
+
+- name: Copy backend files
+  synchronize:
+    src: "../../app/backend/"
+    dest: "/var/www/app/backend/"
+
+- name: Install backend dependencies
+  npm:
+    path: /var/www/app/backend
+    production: yes
+
+- name: Create systemd service file
+  template:
+    src: app.service.j2
+    dest: /etc/systemd/system/app.service
+  notify: restart app
+
+- name: Create Nginx site config
+  template:
+    src: app.conf.j2
+    dest: /etc/nginx/sites-available/app.conf
+
+- name: Enable Nginx site
+  file:
+    src: /etc/nginx/sites-available/app.conf
+    dest: /etc/nginx/sites-enabled/app.conf
+    state: link
+  notify: restart nginx
+
+- name: Allow HTTP/HTTPS
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - 80
+    - 443

@@ -1,0 +1,58 @@
+- name: Update system packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install essential packages
+  apt:
+    name:
+      - curl
+      - git
+      - ufw
+      - fail2ban
+      - python3
+      - python3-pip
+    state: present
+
+- name: Install Python3 for Ansible
+  raw: |
+    apt update
+    apt install -y python3 python3-apt
+  changed_when: false
+
+#delete
+- name: Remove APT lock file if exists
+  raw: rm -f /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock
+  ignore_errors: yes
+
+
+- name: Disable root SSH login
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin no'
+  notify: restart ssh
+
+- name: Disable password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+  notify: restart ssh
+
+- name: Allow SSH only from Ansible control node
+  ufw:
+    rule: allow
+    proto: tcp
+    src: "{{ allow_ssh_from }}"
+    port: 22
+
+- name: Deny SSH from public
+  ufw:
+    rule: deny
+    proto: tcp
+    port: 22
+
+- name: Enable firewall
+  ufw:
+    state: enabled

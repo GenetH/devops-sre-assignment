@@ -1,0 +1,51 @@
+- name: Install MySQL
+  apt:
+    name:
+      - mysql-server
+      - python3-pymysql
+    state: present
+    update_cache: yes
+
+- name: Ensure running
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+
+- name: Remove anonymous users
+  mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+- name: Remove test DB
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+- name: Apply hardened config
+  template:
+    src: mysql.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+  notify: restart mysql
+
+- name: Create app DB
+  mysql_db:
+    name: "{{ mysql_app_db }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+
+- name: Create app user
+  mysql_user:
+    name: "{{ mysql_app_user }}"
+    password: "{{ mysql_app_user_password }}"
+    priv: "{{ mysql_app_db }}.*:ALL"
+    host: "10.0.1.%"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
