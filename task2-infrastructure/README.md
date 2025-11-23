@@ -18,7 +18,7 @@ Prerequisites
 -------------  
 - Ansible (version 2.9 or higher recommended) installed on your control machine.  
 - SSH access to target hosts (or use `ansible_connection=local` for localhost).  
-- Optional: Docker or docker-compose, or Multipass for temporary test hosts.  
+- Optional: Docker or docker-compose for temporary test hosts.  
 - Keep sensitive information encrypted with Ansible Vault or a secret manager; do not commit any credentials.  
 
 Important security and workflow note  
@@ -62,18 +62,11 @@ Cleanup examples
 - Docker Compose (if you used it for test containers):  
   ```bash  
   docker compose down --volumes  
-  ```  
-
-- Multipass:  
-  ```bash  
-  multipass delete --all  
-  multipass purge  
-  ```  
-
+  ``` 
 CI and validation suggestions  
 ---------------------------  
 - Add checks for continuous integration:  
   - `ansible-lint` for roles and playbooks  
   - `yamllint` for YAML quality  
   - `ansible-playbook --syntax-check` and `--check` against a disposable test inventory  
-- Consider adding Molecule tests for each role.  
+ 
